@@ -213,7 +213,7 @@ public class moreAuto extends LinearOpMode {
         strafeLeft(850,0.6);
         slide(-4129, 0.8);
 
-        forward(450,0.4);
+        forward(400,0.4);
         wait(2000.0);
 
         Claw.setPosition(0.08);
@@ -230,7 +230,7 @@ public class moreAuto extends LinearOpMode {
         strafeLeft(850,0.6);
         slide(-4129, 0.8);
 
-        forward(450,0.4);
+        forward(400,0.4);
         wait(2000.0);
 
         Claw.setPosition(0.08);
@@ -288,20 +288,7 @@ public class moreAuto extends LinearOpMode {
 
             telemetry.update();
 
-            Claw.setPosition(0.018);
-            pDrive(3130);
-            strafeRight(850,0.6);
-            slide(-4129, 0.8);
-
-            forward(450,0.4);
-            wait(2000.0);
-
-            Claw.setPosition(0.08);
-            wait(300.0);
-            pDrive(-300);
-            slide(0, 0.6);
-            strafeLeft(2400,0.8);
-
+            middleParking();
             break;
         }
     }
