@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
-public class wholeLottaAuto extends LinearOpMode {
+public class moreAuto extends LinearOpMode {
     private Servo Claw;
     private Blinker control_Hub;
     private Blinker expansion_Hub_1;
@@ -193,7 +193,24 @@ public class wholeLottaAuto extends LinearOpMode {
     public void rightParking(){
         Claw.setPosition(0.018);
         pDrive(3130);
-        strafeRight(850,0.6);
+        strafeLeft(850,0.6);
+        slide(-4129, 0.8);
+
+        forward(450,0.4);
+        wait(2000.0);
+
+        Claw.setPosition(0.08);
+        wait(300.0);
+        pDrive(-300);
+        slide(0, 0.6);
+        strafeRight(2400,0.8);
+    }
+
+    //middle parking
+    public void middleParking(){
+        Claw.setPosition(0.018);
+        pDrive(3130);
+        strafeLeft(850,0.6);
         slide(-4129, 0.8);
 
         forward(450,0.4);
@@ -206,11 +223,11 @@ public class wholeLottaAuto extends LinearOpMode {
         strafeRight(900,0.8);
     }
 
-    //middle parking
-    public void middleParking(){
+    //left parking
+    public void leftParking(){
         Claw.setPosition(0.018);
         pDrive(3130);
-        strafeRight(850,0.6);
+        strafeLeft(850,0.6);
         slide(-4129, 0.8);
 
         forward(450,0.4);
@@ -221,23 +238,6 @@ public class wholeLottaAuto extends LinearOpMode {
         pDrive(-300);
         slide(0, 0.6);
         strafeLeft(900,0.8);
-    }
-
-    //left parking
-    public void leftParking(){
-        Claw.setPosition(0.018);
-        pDrive(3130);
-        strafeRight(850,0.6);
-        slide(-4129, 0.8);
-
-        forward(450,0.4);
-        wait(2000.0);
-
-        Claw.setPosition(0.08);
-        wait(300.0);
-        pDrive(-300);
-        slide(0, 0.6);
-        strafeLeft(2400,0.8);
     }
 
 
@@ -281,10 +281,10 @@ public class wholeLottaAuto extends LinearOpMode {
             telemetry.addData("backLeft",backLeft.getCurrentPosition());
             telemetry.addData("backRight",backRight.getCurrentPosition());
             telemetry.addData("viperSlide",viperSlide.getCurrentPosition());
-            telemetry.addData("tfrontLeft",frontLeft.getPower());
-            telemetry.addData("tfrontRight",frontRight.getPower());
-            telemetry.addData("tbackLeft",backLeft.getPower());
-            telemetry.addData("tbackRight",backRight.getPower());
+            telemetry.addData("frontLeft",frontLeft.getPower());
+            telemetry.addData("frontRight",frontRight.getPower());
+            telemetry.addData("backLeft",backLeft.getPower());
+            telemetry.addData("backRight",backRight.getPower());
 
             telemetry.update();
 
