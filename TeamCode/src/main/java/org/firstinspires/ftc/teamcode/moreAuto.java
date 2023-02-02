@@ -1,16 +1,21 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.Blinker;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.Gyroscope;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import java.util.Objects;
 
 @Autonomous
 public class moreAuto extends LinearOpMode {
@@ -24,8 +29,10 @@ public class moreAuto extends LinearOpMode {
     private Servo coneGrabber;
     private DcMotor frontLeft;
     private DcMotor frontRight;
-    private Gyroscope imu;
+    private IMU imu;
     private DcMotor viperSlide;
+
+    YawPitchRollAngles ypr;
 
     public void wait(double time) {
         ElapsedTime waitTime = new ElapsedTime();
@@ -189,6 +196,50 @@ public class moreAuto extends LinearOpMode {
         backRight.setPower(0);
     }
 
+    //turning
+    public void turn(double angle,  double power, String direction){
+        frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        imu.resetYaw();
+        ypr = imu.getRobotYawPitchRollAngles();
+
+        if(direction.equals("left")){
+            power *= -1;
+        }
+
+        frontLeft.setPower(power);
+        frontRight.setPower(-power);
+        backLeft.setPower(power);
+        backRight.setPower(-power);
+
+        while (opModeIsActive() && Math.abs(ypr.getYaw(AngleUnit.DEGREES)) < angle) {
+            telemetry.addData("Current Angle", ypr.getYaw(AngleUnit.DEGREES));
+            telemetry.addData("Target Angle", angle);
+            telemetry.addData("Direction", direction);
+            telemetry.update();
+
+            ypr = imu.getRobotYawPitchRollAngles(); // Keep updating YPR until we reach ideal angle
+        }
+
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+    }
     //right parking
     public void rightParking(){
         Claw.setPosition(0.018);
@@ -262,6 +313,16 @@ public class moreAuto extends LinearOpMode {
         backRight = hardwareMap.get(DcMotor.class, "backRight");
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+        IMU.Parameters parameters = new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                        RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
+                )
+        );
+        imu = hardwareMap.get(IMU.class, "imu");
+        ypr = imu.getRobotYawPitchRollAngles();
+        imu.initialize(parameters);
+        imu.resetYaw();
         //reverses left motors
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
