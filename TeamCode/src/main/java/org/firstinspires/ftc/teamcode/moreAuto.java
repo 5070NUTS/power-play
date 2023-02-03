@@ -17,8 +17,30 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import java.util.Objects;
 
+import org.firstinspires.ftc.teamcode.telletubbies.camera;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvInternalCamera;
+import org.openftc.easyopencv.OpenCvPipeline;
+
+import org.opencv.videoio.VideoCapture;
+import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+
 @Autonomous
+//RIGHT SIDE AUTO
 public class moreAuto extends LinearOpMode {
+    OpenCvInternalCamera phoneCam;
+    camera.SkystoneDeterminationPipeline pipeline;
     private Servo Claw;
     private Blinker control_Hub;
     private Blinker expansion_Hub_1;
@@ -46,7 +68,7 @@ public class moreAuto extends LinearOpMode {
         viperSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         viperSlide.setPower(power);
         while(viperSlide.isBusy()){
-            telemetry.addData("penis", viperSlide.getCurrentPosition());
+            telemetry.addData("viper", viperSlide.getCurrentPosition());
         }
     }
 
@@ -74,7 +96,7 @@ public class moreAuto extends LinearOpMode {
         backRight.setPower(power);
 
         while(frontLeft.isBusy()){
-            telemetry.addData("fuck vishwa ong", viperSlide.getCurrentPosition());
+            telemetry.addData("viper", viperSlide.getCurrentPosition());
         }
     }
 
@@ -101,7 +123,7 @@ public class moreAuto extends LinearOpMode {
         backLeft.setPower(-power);
         backRight.setPower(-power);
         while(frontLeft.isBusy()){
-            telemetry.addData("fuck vishwa ong", viperSlide.getCurrentPosition());
+            telemetry.addData("viper", viperSlide.getCurrentPosition());
         }
     }
 
@@ -128,7 +150,7 @@ public class moreAuto extends LinearOpMode {
         backLeft.setPower(power);
         backRight.setPower(power);
         while(frontLeft.isBusy()){
-            telemetry.addData("fuck vishwa ong", viperSlide.getCurrentPosition());
+            telemetry.addData("viper", viperSlide.getCurrentPosition());
         }
     }
 
@@ -156,7 +178,7 @@ public class moreAuto extends LinearOpMode {
         backRight.setPower(power);
 
         while(frontLeft.isBusy()){
-            telemetry.addData("fuck vishwa ong in the ass", viperSlide.getCurrentPosition());
+            telemetry.addData("viper", viperSlide.getCurrentPosition());
         }
     }
     public void pDrive(int target) {
@@ -333,6 +355,25 @@ public class moreAuto extends LinearOpMode {
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         viperSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+        pipeline = new camera.SkystoneDeterminationPipeline();
+        phoneCam.setPipeline(pipeline);
+
+        phoneCam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
+
+        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                phoneCam.startStreaming(320, 240, OpenCvCameraRotation.SIDEWAYS_LEFT);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+
+            }
+        });
+
 
         waitForStart();
         while (opModeIsActive()){
@@ -349,8 +390,74 @@ public class moreAuto extends LinearOpMode {
 
             telemetry.update();
 
-            middleParking();
+            int position = pipeline.getPosition();
+            sleep(1000);
+            position = pipeline.getPosition();
+
+            if (position == 1){
+                leftParking();
+            }
+            else if (position == 2){
+                middleParking();
+            }
+            else rightParking();
             break;
+        }
+    }
+    public class SkystoneDeterminationPipeline extends OpenCvPipeline {
+        final Scalar RED = new Scalar(255, 0, 0);
+        final Scalar BLACK = new Scalar(0, 0, 0);
+        final Scalar WHITE = new Scalar(255, 255, 255);
+
+        int position;
+
+        final Point CONE_TOP_LEFT_ANCHOR_POINT = new Point(130, 200);
+
+        Point cone_pointA = new Point(CONE_TOP_LEFT_ANCHOR_POINT.x, CONE_TOP_LEFT_ANCHOR_POINT.y);
+        Point cone_pointB = new Point(
+                CONE_TOP_LEFT_ANCHOR_POINT.x + 20, // adding region width
+                CONE_TOP_LEFT_ANCHOR_POINT.y + 20); // adding region height
+
+        Mat region1_Y;
+        Mat YCrCb = new Mat();
+        Mat Y = new Mat();
+        int avgConeY;
+
+        void inputToChannels(Mat input) {
+            Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
+            Core.extractChannel(YCrCb, Y, 0);
+        }
+
+        @Override
+        public void init(Mat firstFrame) {
+            inputToChannels(firstFrame);
+            region1_Y = Y.submat(new Rect(cone_pointA, cone_pointB));
+        }
+
+        @Override
+        public Mat processFrame(Mat input) {
+            inputToChannels(input);
+            avgConeY = (int) Core.mean(region1_Y).val[0];
+
+            if (avgConeY < 50) {
+                position = 3;
+                Imgproc.rectangle(input, cone_pointA, cone_pointB, BLACK, -1);
+            } else if (avgConeY < 150) {
+                position = 1;
+                Imgproc.rectangle(input, cone_pointA, cone_pointB, RED, -1);
+            } else {
+                position = 2;
+                Imgproc.rectangle(input, cone_pointA, cone_pointB, WHITE, -1);
+            }
+            return input;
+        }
+
+        public int getAvgY() {
+            return avgConeY;
+        }
+
+        public int getPosition() {
+            return position;
         }
     }
 
