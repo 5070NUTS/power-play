@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import java.util.Objects;
 
-import org.firstinspires.ftc.teamcode.telletubbies.camera;
+import org.firstinspires.ftc.teamcode.camera;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -40,7 +40,7 @@ import org.opencv.imgproc.Imgproc;
 //RIGHT SIDE AUTO
 public class moreAuto extends LinearOpMode {
     OpenCvInternalCamera phoneCam;
-    camera.SkystoneDeterminationPipeline pipeline;
+    SkystoneDeterminationPipeline pipeline;
     private Servo Claw;
     private Blinker control_Hub;
     private Blinker expansion_Hub_1;
@@ -357,7 +357,7 @@ public class moreAuto extends LinearOpMode {
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-        pipeline = new camera.SkystoneDeterminationPipeline();
+        pipeline = new SkystoneDeterminationPipeline();
         phoneCam.setPipeline(pipeline);
 
         phoneCam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
@@ -400,7 +400,9 @@ public class moreAuto extends LinearOpMode {
             else if (position == 2){
                 middleParking();
             }
-            else rightParking();
+            else if(position == 3){
+                rightParking();
+            }
             break;
         }
     }
@@ -411,7 +413,7 @@ public class moreAuto extends LinearOpMode {
 
         int position;
 
-        final Point CONE_TOP_LEFT_ANCHOR_POINT = new Point(130, 200);
+        final Point CONE_TOP_LEFT_ANCHOR_POINT = new Point(295, 120);
 
         Point cone_pointA = new Point(CONE_TOP_LEFT_ANCHOR_POINT.x, CONE_TOP_LEFT_ANCHOR_POINT.y);
         Point cone_pointB = new Point(

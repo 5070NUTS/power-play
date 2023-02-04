@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode.telletubbies;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -137,7 +137,7 @@ public class camera extends LinearOpMode {
         }
     }
 
-    public class SkystoneDeterminationPipeline extends OpenCvPipeline {
+    public static class SkystoneDeterminationPipeline extends OpenCvPipeline {
             final Scalar RED = new Scalar(255, 0, 0);
             final Scalar BLACK = new Scalar(0, 0, 0);
             final Scalar WHITE = new Scalar(255, 255, 255);

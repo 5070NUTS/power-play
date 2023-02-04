@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.telletubbies.camera;
+import org.firstinspires.ftc.teamcode.camera;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -40,7 +40,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 //LEFT SIDE AUTO
 public class wholeLottaAuto extends LinearOpMode {
     OpenCvInternalCamera phoneCam;
-    camera.SkystoneDeterminationPipeline pipeline;
+    SkystoneDeterminationPipeline pipeline;
     private Servo Claw;
     private Blinker control_Hub;
     private Blinker expansion_Hub_1;
@@ -260,7 +260,8 @@ public class wholeLottaAuto extends LinearOpMode {
         wait(300.0);
         pDrive(-300);
         slide(0, 0.6);
-        strafeRight(900,0.8);
+        strafeRight(890,0.8);
+        Claw.setPosition(0.018);
     }
 
     //middle parking
@@ -270,7 +271,7 @@ public class wholeLottaAuto extends LinearOpMode {
         strafeRight(850,0.6);
         slide(-4129, 0.8);
 
-        forward(450,0.4);
+        forward(400,0.4);
         wait(2000.0);
 
         Claw.setPosition(0.08);
@@ -278,6 +279,7 @@ public class wholeLottaAuto extends LinearOpMode {
         pDrive(-300);
         slide(0, 0.6);
         strafeLeft(900,0.8);
+        Claw.setPosition(0.018);
     }
 
     //left parking
@@ -294,7 +296,8 @@ public class wholeLottaAuto extends LinearOpMode {
         wait(300.0);
         pDrive(-300);
         slide(0, 0.6);
-        strafeLeft(2400,0.8);
+        strafeLeft(2450,0.8);
+        Claw.setPosition(0.018);
     }
 
 
@@ -341,7 +344,7 @@ public class wholeLottaAuto extends LinearOpMode {
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-        pipeline = new camera.SkystoneDeterminationPipeline();
+        pipeline = new SkystoneDeterminationPipeline();
         phoneCam.setPipeline(pipeline);
 
         phoneCam.setViewportRenderingPolicy(OpenCvCamera.ViewportRenderingPolicy.OPTIMIZE_VIEW);
@@ -384,7 +387,9 @@ public class wholeLottaAuto extends LinearOpMode {
             else if (position == 2){
                 middleParking();
             }
-            else rightParking();
+            else if (position == 3) {
+                rightParking();
+            }
 
 
             break;
@@ -397,7 +402,7 @@ public class wholeLottaAuto extends LinearOpMode {
 
         int position;
 
-        final Point CONE_TOP_LEFT_ANCHOR_POINT = new Point(130, 200);
+        final Point CONE_TOP_LEFT_ANCHOR_POINT = new Point(295, 120);
 
         Point cone_pointA = new Point(CONE_TOP_LEFT_ANCHOR_POINT.x, CONE_TOP_LEFT_ANCHOR_POINT.y);
         Point cone_pointB = new Point(
